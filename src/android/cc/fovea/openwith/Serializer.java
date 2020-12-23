@@ -81,7 +81,11 @@ class Serializer {
             final int clipItemCount = clipData.getItemCount();
             JSONObject[] items = new JSONObject[clipItemCount];
             for (int i = 0; i < clipItemCount; i++) {
-                items[i] = toJSONObject(contentResolver, clipData.getItemAt(i).getUri());
+                if(clipData.getItemAt(i).getUri() != null){
+                    items[i] = toJSONObject(contentResolver, clipData.getItemAt(i).getUri());
+                }else{
+                    items[i] = toJSONObject(contentResolver, clipData.getItemAt(i).getText().toString());
+                }
             }
             return new JSONArray(items);
         }
@@ -150,6 +154,21 @@ class Serializer {
         json.put("type", type);
         json.put("uri", uri);
         json.put("path", getRealPathFromURI(contentResolver, uri));
+        return json;
+    }
+
+    public static JSONObject toJSONObject(
+            final ContentResolver contentResolver,
+            final String text)
+            throws JSONException {
+        if (text == null) {
+            return null;
+        }
+        final JSONObject json = new JSONObject();
+        final String type =  "text/plain";
+        json.put("type", type);
+        json.put("uri", text);
+        json.put("path", text);
         return json;
     }
 
